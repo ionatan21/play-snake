@@ -10,6 +10,11 @@ let keyDelay = 50;
 let score = 0;
 let highScore = 0;
 
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
 function setup() {
   createCanvas(floor(windowWidth / 100) * 100, floor(windowHeight / 100) * 80);
   highScore = localStorage.getItem("highScore");
@@ -17,8 +22,11 @@ function setup() {
     document.getElementById("highScore").textContent = highScore;
   }
   s = new Snake();
-  frameRate(24);
+  frameRate(14);
   pickLocation();
+
+  document.addEventListener("touchstart", handleTouchStart, false);
+  document.addEventListener("touchend", handleTouchEnd, false);
 }
 
 function pickLocation() {
@@ -48,15 +56,14 @@ function pickLocation() {
   food = newFood;
 }
 
-
 function draw() {
   background(51);
   if (!gameStarted) {
     textAlign(CENTER);
     fill(255);
-    textSize(32);
-    text("Presiona Enter para comenzar", width / 2, height / 2);
-    textSize(24);
+    textSize(25);
+    text("Presiona para comenzar", width / 2, height / 2);
+    textSize(20);
     text("Controles ⬆️⬇️➡️⬅️", width / 2, height / 1.7);
     return;
   }
@@ -65,8 +72,8 @@ function draw() {
     document.getElementById("score").textContent = 0;
     textAlign(CENTER);
     fill(255);
-    textSize(32);
-    text("GAME OVER\nPresiona Enter para reiniciar", width / 2, height / 2);
+    textSize(25);
+    text("GAME OVER\nPresiona para reiniciar", width / 2, height / 2);
     noLoop();
     return;
   }
@@ -120,4 +127,42 @@ function updateScore() {
   document.getElementById("score").textContent = score;
   document.getElementById("highScore").textContent = highScore;
   localStorage.setItem("highScore", highScore);
+}   
+
+function mousePressed() {
+  if (!gameStarted) {
+    gameStarted = true;
+  }
+}
+
+
+function handleTouchStart(event) {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchEnd(event) {
+  touchEndX = event.changedTouches[0].clientX;
+  touchEndY = event.changedTouches[0].clientY;
+
+  handleGesture();
+}
+
+function handleGesture() {
+  let dx = touchEndX - touchStartX;
+  let dy = touchEndY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0 && s.xspeed === 0) {
+      s.dir(1, 0); // Deslizar a la derecha
+    } else if (dx < 0 && s.xspeed === 0) {
+      s.dir(-1, 0); // Deslizar a la izquierda
+    }
+  } else {
+    if (dy > 0 && s.yspeed === 0) {
+      s.dir(0, 1); // Deslizar hacia abajo
+    } else if (dy < 0 && s.yspeed === 0) {
+      s.dir(0, -1); // Deslizar hacia arriba
+    }
+  }
 }
