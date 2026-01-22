@@ -21,6 +21,7 @@ canvas {
   display: flex;
   margin: 20px;
   justify-content: space-between;
+  align-items: center;
   width: 75%;
   padding: 10px;
   font-size: 20px;
@@ -28,6 +29,23 @@ canvas {
   border-radius: 5px;
   color: white;
   font-family: sans-serif;
+}
+
+.autor {
+  width: 45px;
+  height: 45px;
+  background-image: url('Graphics/Logo.svg');
+  background-size: cover;
+  background-position: center;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.autor:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+  transition: all 0.2s;
 }
 
 @media screen and (max-width: 600px) {

@@ -3,7 +3,7 @@ let alpha = 0;
 let increasing = true;
 let gameStarted = false;
 let gameOver = false;
-let moveDelay = 50;
+let moveDelay = 100;
 let lastMoveTime = 0;
 let lastKeyPressTime = 0;
 let keyDelay = 50;
@@ -15,6 +15,31 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 
+// Sprites
+let appleImg;
+let headUp, headDown, headLeft, headRight;
+let bodyHorizontal, bodyVertical;
+let bodyTopLeft, bodyTopRight, bodyBottomLeft, bodyBottomRight;
+let tailUp, tailDown, tailLeft, tailRight;
+
+function preload() {
+  appleImg = loadImage('Graphics/apple.png');
+  headUp = loadImage('Graphics/head_up.png');
+  headDown = loadImage('Graphics/head_down.png');
+  headLeft = loadImage('Graphics/head_left.png');
+  headRight = loadImage('Graphics/head_right.png');
+  bodyHorizontal = loadImage('Graphics/body_horizontal.png');
+  bodyVertical = loadImage('Graphics/body_vertical.png');
+  bodyTopLeft = loadImage('Graphics/body_topleft.png');
+  bodyTopRight = loadImage('Graphics/body_topright.png');
+  bodyBottomLeft = loadImage('Graphics/body_bottomleft.png');
+  bodyBottomRight = loadImage('Graphics/body_bottomright.png');
+  tailUp = loadImage('Graphics/tail_up.png');
+  tailDown = loadImage('Graphics/tail_down.png');
+  tailLeft = loadImage('Graphics/tail_left.png');
+  tailRight = loadImage('Graphics/tail_right.png');
+}
+
 function setup() {
   createCanvas(floor(windowWidth / 100) * 100, floor(windowHeight / 100) * 80);
   highScore = localStorage.getItem("highScore");
@@ -22,7 +47,7 @@ function setup() {
     document.getElementById("highScore").textContent = highScore;
   }
   s = new Snake();
-  frameRate(14);
+  frameRate(60);
   pickLocation();
 
   document.addEventListener("touchstart", handleTouchStart, false);
@@ -57,14 +82,28 @@ function pickLocation() {
 }
 
 function draw() {
-  background(51);
+  // Dibujar patrón de tablero de ajedrez con dos tonos de verde
+  let cols = width / scl;
+  let rows = height / scl;
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      if ((i + j) % 2 === 0) {
+        fill(170, 215, 81); // Verde claro
+      } else {
+        fill(162, 209, 73); // Verde más oscuro
+      }
+      noStroke();
+      rect(i * scl, j * scl, scl, scl);
+    }
+  }
+  
   if (!gameStarted) {
     textAlign(CENTER);
     fill(255);
     textSize(25);
-    text("Presiona para comenzar", width / 2, height / 2);
+    text("Press to start", width / 2, height / 2);
     textSize(20);
-    text("Controles ⬆️⬇️➡️⬅️", width / 2, height / 1.7);
+    text("Controls ⬆️⬇️➡️⬅️", width / 2, height / 1.7);
     return;
   }
 
@@ -73,7 +112,7 @@ function draw() {
     textAlign(CENTER);
     fill(255);
     textSize(25);
-    text("GAME OVER\nPresiona para reiniciar", width / 2, height / 2);
+    text("GAME OVER\nPress to restart", width / 2, height / 2);
     noLoop();
     return;
   }
@@ -92,8 +131,8 @@ function draw() {
   alpha = increasing ? alpha + 5 : alpha - 5;
   if (alpha > 255 || alpha < 100) increasing = !increasing;
 
-  fill(255, 0, 100);
-  rect(food.x, food.y, scl, scl);
+  // Dibujar manzana con sprite
+  image(appleImg, food.x, food.y, scl, scl);
 }
 
 function keyPressed() {
