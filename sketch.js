@@ -3,6 +3,7 @@ let alpha = 0;
 let increasing = true;
 let gameStarted = false;
 let gameOver = false;
+let gameWon = false;
 let moveDelay = 100;
 let lastMoveTime = 0;
 let lastKeyPressTime = 0;
@@ -22,6 +23,9 @@ let bodyHorizontal, bodyVertical;
 let bodyTopLeft, bodyTopRight, bodyBottomLeft, bodyBottomRight;
 let tailUp, tailDown, tailLeft, tailRight;
 
+// Sonidos
+let foodSound, gameOverSound, moveSound;
+
 function preload() {
   appleImg = loadImage('Graphics/apple.png');
   headUp = loadImage('Graphics/head_up.png');
@@ -38,6 +42,11 @@ function preload() {
   tailDown = loadImage('Graphics/tail_down.png');
   tailLeft = loadImage('Graphics/tail_left.png');
   tailRight = loadImage('Graphics/tail_right.png');
+  
+  // Cargar sonidos
+  foodSound = loadSound('music/food.mp3');
+  gameOverSound = loadSound('music/gameover.mp3');
+  moveSound = loadSound('music/move.mp3');
 }
 
 function setup() {
@@ -117,6 +126,18 @@ function draw() {
     return;
   }
 
+  if (gameWon) {
+    textAlign(CENTER);
+    fill(255, 215, 0); // Color dorado
+    textSize(30);
+    text("🎉 VICTORY! 🎉", width / 2, height / 2 - 20);
+    textSize(20);
+    fill(255);
+    text("You conquered the board!\nPress to restart", width / 2, height / 2 + 30);
+    noLoop();
+    return;
+  }
+
   if (millis() - lastMoveTime > moveDelay) {
     s.update();
     lastMoveTime = millis();
@@ -149,6 +170,13 @@ function keyPressed() {
   } else if (!isLooping()) {
     gameStarted = true;
     gameOver = false;
+    gameWon = false;
+    
+    // Detener todos los sonidos antes de reiniciar
+    if (foodSound && foodSound.isPlaying()) foodSound.stop();
+    if (gameOverSound && gameOverSound.isPlaying()) gameOverSound.stop();
+    if (moveSound && moveSound.isPlaying()) moveSound.stop();
+    
     s = new Snake();
     loop();
   } else if (keyCode === UP_ARROW && s.yspeed === 0) {

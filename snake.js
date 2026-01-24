@@ -14,6 +14,17 @@ function Snake() {
       if (score > highScore) highScore = score;
       updateScore();
 
+      // Verificar victoria (serpiente ocupa todo el tablero)
+      var totalCells = (width / scl) * (height / scl);
+      if (this.length >= totalCells - 1) {
+        gameWon = true;
+      }
+
+      // Reproducir sonido de comida
+      if (foodSound && foodSound.isLoaded()) {
+        foodSound.play();
+      }
+
       return true;
     }
     return false;
@@ -22,6 +33,11 @@ function Snake() {
   this.dir = function (x, y) {
     this.xspeed = x;
     this.yspeed = y;
+    
+    // Reproducir sonido de movimiento
+    if (moveSound && moveSound.isLoaded() && !moveSound.isPlaying()) {
+      moveSound.play();
+    }
   };
 
   this.death = function () {
@@ -31,6 +47,11 @@ function Snake() {
         gameOver = true;
         updateScore();
         score = 0;
+        
+        // Reproducir sonido de game over
+        if (gameOverSound && gameOverSound.isLoaded()) {
+          gameOverSound.play();
+        }
       }
     }
   };
@@ -57,7 +78,18 @@ function Snake() {
     // Dibujar cola y cuerpo
     for (var i = 0; i < this.tail.length; i++) {
       let segment = this.tail[i];
-      let nextSegment = (i < this.tail.length - 1) ? this.tail[i + 1] : createVector(this.x, this.y);
+      let nextSegment, nextNextSegment;
+      
+      // Para el último segmento del tail, usar la posición y dirección de la cabeza
+      if (i === this.tail.length - 1) {
+        nextSegment = createVector(this.x, this.y);
+        // Simular el próximo segmento basado en la velocidad actual
+        nextNextSegment = createVector(this.x + this.xspeed * scl, this.y + this.yspeed * scl);
+      } else {
+        nextSegment = this.tail[i + 1];
+        nextNextSegment = (i < this.tail.length - 2) ? this.tail[i + 2] : createVector(this.x, this.y);
+      }
+      
       let prevSegment = (i > 0) ? this.tail[i - 1] : null;
       
       // Si es el último segmento del tail, es la cola
@@ -65,10 +97,17 @@ function Snake() {
         let tailImg = tailDown; // por defecto
         if (prevSegment === null) {
           // Determinar dirección basada en el siguiente segmento
-          if (nextSegment.x > segment.x) tailImg = tailLeft;
-          else if (nextSegment.x < segment.x) tailImg = tailRight;
-          else if (nextSegment.y > segment.y) tailImg = tailUp;
-          else if (nextSegment.y < segment.y) tailImg = tailDown;
+          let dx = nextSegment.x - segment.x;
+          let dy = nextSegment.y - segment.y;
+          
+          // Normalizar wrap around
+          if (Math.abs(dx) > scl) dx = dx > 0 ? -scl : scl;
+          if (Math.abs(dy) > scl) dy = dy > 0 ? -scl : scl;
+          
+          if (dx > 0) tailImg = tailLeft;
+          else if (dx < 0) tailImg = tailRight;
+          else if (dy > 0) tailImg = tailUp;
+          else if (dy < 0) tailImg = tailDown;
         }
         image(tailImg, segment.x, segment.y, scl, scl);
       } else {
