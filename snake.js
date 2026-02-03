@@ -5,6 +5,9 @@ function Snake() {
   this.yspeed = 0;
   this.length = 0;
   this.tail = [];
+  this.lastXSpeed = 1;  // Última dirección ejecutada
+  this.lastYSpeed = 0;
+  this.nextDir = null;  // Cola para el próximo cambio de dirección
 
   this.eat = function (pos) {
     var d = dist(this.x, this.y, pos.x, pos.y);
@@ -31,12 +34,11 @@ function Snake() {
   };
 
   this.dir = function (x, y) {
-    this.xspeed = x;
-    this.yspeed = y;
-    
-    // Reproducir sonido de movimiento
-    if (moveSound && moveSound.isLoaded() && !moveSound.isPlaying()) {
-      moveSound.play();
+    // Validar contra la ÚLTIMA dirección ejecutada, no la pendiente
+    // Solo permitir si no es la dirección opuesta Y si es diferente a la dirección actual
+    if (((x !== 0 && x !== -this.lastXSpeed) || (y !== 0 && y !== -this.lastYSpeed)) &&
+        (x !== this.xspeed || y !== this.yspeed)) {
+      this.nextDir = { x: x, y: y };
     }
   };
 
@@ -57,6 +59,18 @@ function Snake() {
   };
 
   this.update = function () {
+    // Aplicar cambio de dirección pendiente ANTES de mover
+    if (this.nextDir !== null) {
+      this.xspeed = this.nextDir.x;
+      this.yspeed = this.nextDir.y;
+      this.nextDir = null;
+      
+      // Reproducir sonido de movimiento
+      if (moveSound && moveSound.isLoaded() && !moveSound.isPlaying()) {
+        moveSound.play();
+      }
+    }
+    
     if (this.length > 0) {
       this.tail.push(createVector(this.x, this.y));
       if (this.tail.length > this.length) {
@@ -66,6 +80,10 @@ function Snake() {
 
     this.x += this.xspeed * scl;
     this.y += this.yspeed * scl;
+    
+    // Guardar la dirección que acabamos de ejecutar
+    this.lastXSpeed = this.xspeed;
+    this.lastYSpeed = this.yspeed;
 
     // Permitir que atraviese los bordes
     if (this.x < 0) this.x = width - scl;

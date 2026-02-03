@@ -179,13 +179,13 @@ function keyPressed() {
     
     s = new Snake();
     loop();
-  } else if (keyCode === UP_ARROW && s.yspeed === 0) {
+  } else if (keyCode === UP_ARROW) {
     s.dir(0, -1);
-  } else if (keyCode === DOWN_ARROW && s.yspeed === 0) {
+  } else if (keyCode === DOWN_ARROW) {
     s.dir(0, 1);
-  } else if (keyCode === RIGHT_ARROW && s.xspeed === 0) {
+  } else if (keyCode === RIGHT_ARROW) {
     s.dir(1, 0);
-  } else if (keyCode === LEFT_ARROW && s.xspeed === 0) {
+  } else if (keyCode === LEFT_ARROW) {
     s.dir(-1, 0);
   }
 }
@@ -220,15 +220,15 @@ function handleGesture() {
   let dy = touchEndY - touchStartY;
 
   if (Math.abs(dx) > Math.abs(dy)) {
-    if (dx > 0 && s.xspeed === 0) {
+    if (dx > 0) {
       s.dir(1, 0); // Deslizar a la derecha
-    } else if (dx < 0 && s.xspeed === 0) {
+    } else if (dx < 0) {
       s.dir(-1, 0); // Deslizar a la izquierda
     }
   } else {
-    if (dy > 0 && s.yspeed === 0) {
+    if (dy > 0) {
       s.dir(0, 1); // Deslizar hacia abajo
-    } else if (dy < 0 && s.yspeed === 0) {
+    } else if (dy < 0) {
       s.dir(0, -1); // Deslizar hacia arriba
     }
   }
